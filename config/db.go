@@ -3,6 +3,7 @@ package config
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -47,6 +48,6 @@ func MySQL(c *Config) (*sql.DB, error) {
 		return nil, err
 	}
 
-	fmt.Println("koneksi sukses")
+	log.Println("Successfully to connect in database")
 	return db, nil
 }
