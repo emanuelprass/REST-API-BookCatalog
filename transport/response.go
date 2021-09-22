@@ -9,12 +9,12 @@ type GeneralResponse struct {
 }
 
 type GetList struct {
-	Count    int           `json: "count"`
-	ListBook []entity.Book `json: "listBook"`
+	Count    int           `json:"count"`
+	ListBook []entity.Book `json:"listBook"`
 }
 
 type GetBookResponse struct {
-	Data entity.Book `json: "data"`
+	Data entity.Book `json:"data"`
 }
 
 type ResponseError struct {

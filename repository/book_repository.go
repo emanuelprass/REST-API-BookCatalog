@@ -8,6 +8,7 @@ import (
 type BookRepository interface {
 	GetList() ([]entity.Book, error)
 	AddBook(payload entity.Book) error
+	GetByID(id string) (*entity.Book, error)
 }
 
 type bookRepository struct {
@@ -40,8 +41,23 @@ func (b *bookRepository) GetList() ([]entity.Book, error) {
 
 func (b *bookRepository) AddBook(payload entity.Book) error {
 	_, err := b.DB.Exec("INSERT INTO tbl_books (book_name, book_creator) VALUES (?, ?)", payload.Name, payload.Creator)
+
 	if err != nil {
 		return err
 	}
+
 	return nil
+}
+
+func (b *bookRepository) GetByID(id string) (*entity.Book, error) {
+	sqlStatement := "SELECT * FROM tbl_books WHERE book_id = ?"
+	row := b.DB.QueryRow(sqlStatement, id)
+	var book entity.Book
+	err := row.Scan(&book.Id, &book.Name, &book.Creator)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &book, nil
 }
