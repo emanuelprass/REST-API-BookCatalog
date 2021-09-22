@@ -18,7 +18,6 @@ type Config struct {
 	DbPort     string
 }
 
-// load env
 func LoadConfig() *Config {
 	err := godotenv.Load()
 	if err != nil {

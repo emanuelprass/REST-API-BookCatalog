@@ -5,7 +5,6 @@ import (
 	"book-catalog-rest/repository"
 	"book-catalog-rest/usecase"
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
@@ -38,5 +37,5 @@ func (server *ApiServer) registerRouter() {
 	uCase := usecase.NewBookUsecase(repo)
 	bookHandler := handler.NewBookHandler(uCase, server.validator)
 
-	fmt.Println(bookHandler)
+	server.Router.HandleFunc("/api/books", bookHandler.GetList).Methods("GET")
 }
