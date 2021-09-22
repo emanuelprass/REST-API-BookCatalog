@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"book-catalog-rest/entity"
 	"book-catalog-rest/repository"
 	"book-catalog-rest/transport"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 
 type BookUsecase interface {
 	GetList() (*transport.GetList, *transport.ResponseError)
+	AddBook(data transport.InsertBook) (*transport.GeneralResponse, *transport.ResponseError)
 }
 
 type bookUsecase struct {
@@ -33,4 +35,27 @@ func (b *bookUsecase) GetList() (*transport.GetList, *transport.ResponseError) {
 		Count:    len(result),
 		ListBook: result,
 	}, nil
+}
+
+func (b *bookUsecase) AddBook(data transport.InsertBook) (*transport.GeneralResponse, *transport.ResponseError) {
+	createPayload := entity.Book{
+		Name:    data.Name,
+		Creator: data.Creator,
+	}
+
+	err := b.repository.AddBook(createPayload)
+
+	if err != nil {
+		response := &transport.ResponseError{
+			Message: "Un Processable Entity",
+			Status:  http.StatusUnprocessableEntity,
+		}
+		return nil, response
+	}
+
+	result := &transport.GeneralResponse{
+		Message: "Success to insert book : " + createPayload.Name + " into database",
+	}
+
+	return result, nil
 }

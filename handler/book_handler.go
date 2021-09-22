@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"book-catalog-rest/transport"
 	"book-catalog-rest/usecase"
 	"encoding/json"
 	"net/http"
@@ -26,6 +27,45 @@ func (b *bookHandler) GetList(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(err)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
+}
+
+func (b *bookHandler) AddBook(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+	w.Header().Set("Content-Type", "application/json")
+
+	var requestBook transport.InsertBook
+	err := decoder.Decode(&requestBook)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		responses := transport.ResponseError{
+			Message: "error while decode request body",
+			Status:  http.StatusBadRequest,
+		}
+		json.NewEncoder(w).Encode(responses)
+		return
+	}
+
+	// checking validation
+	errorValidation := b.validator.Struct(requestBook)
+	if errorValidation != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		dataResponse := transport.ResponseError{
+			Message: errorValidation.Error(),
+			Status:  http.StatusBadRequest,
+		}
+		json.NewEncoder(w).Encode(dataResponse)
+		return
+	}
+
+	result, responseError := b.usecase.AddBook(requestBook)
+	if responseError != nil {
+		w.WriteHeader(responseError.Status)
+		json.NewEncoder(w).Encode(responseError)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

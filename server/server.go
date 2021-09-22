@@ -38,4 +38,5 @@ func (server *ApiServer) registerRouter() {
 	bookHandler := handler.NewBookHandler(uCase, server.validator)
 
 	server.Router.HandleFunc("/api/books", bookHandler.GetList).Methods("GET")
+	server.Router.HandleFunc("/api/insertbook", bookHandler.AddBook).Methods("POST")
 }
