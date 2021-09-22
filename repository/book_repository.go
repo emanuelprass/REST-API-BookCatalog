@@ -20,16 +20,19 @@ func NewBookRepository(db *sql.DB) BookRepository {
 }
 
 func (b *bookRepository) GetList() ([]entity.Book, error) {
+	rows, err := b.DB.Query("select book_id, book_name, book_creator from tbl_books")
 
-	rows, err := b.DB.Query("select book_id, book_name, book_creator from tb_books")
 	if err != nil {
 		return nil, err
 	}
+
 	var books []entity.Book
+
 	for rows.Next() {
 		var res entity.Book
 		_ = rows.Scan(&res.Id, &res.Name, &res.Creator)
 		books = append(books, res)
 	}
+
 	return books, nil
 }
