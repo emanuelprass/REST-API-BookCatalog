@@ -6,7 +6,6 @@ type InsertBook struct {
 }
 
 type UpdateBook struct {
-	Id      string `json:"id" validate:"required"`
-	Name    string `json:"name"`
-	Creator string `json:"creator"`
+	Name    string `json:"bookName"`
+	Creator string `json:"bookCreator"`
 }

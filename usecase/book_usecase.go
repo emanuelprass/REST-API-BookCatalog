@@ -11,7 +11,8 @@ import (
 type BookUsecase interface {
 	GetList() (*transport.GetList, *transport.ResponseError)
 	AddBook(data transport.InsertBook) (*transport.GeneralResponse, *transport.ResponseError)
-	GetByID(id string) (*transport.GetBookResponse, *transport.ResponseError)
+	GetByID(id int) (*transport.GetBookResponse, *transport.ResponseError)
+	UpdateBook(id int, data transport.UpdateBook) (*transport.GeneralResponse, *transport.ResponseError)
 }
 
 type bookUsecase struct {
@@ -64,7 +65,7 @@ func (b *bookUsecase) AddBook(data transport.InsertBook) (*transport.GeneralResp
 	return result, nil
 }
 
-func (b *bookUsecase) GetByID(id string) (*transport.GetBookResponse, *transport.ResponseError) {
+func (b *bookUsecase) GetByID(id int) (*transport.GetBookResponse, *transport.ResponseError) {
 	result, err := b.repository.GetByID(id)
 
 	if err != nil {
@@ -80,4 +81,45 @@ func (b *bookUsecase) GetByID(id string) (*transport.GetBookResponse, *transport
 	return &transport.GetBookResponse{
 		Data: *result,
 	}, nil
+}
+
+func (b *bookUsecase) UpdateBook(id int, data transport.UpdateBook) (*transport.GeneralResponse, *transport.ResponseError) {
+	result, errBook := b.repository.GetByID(id)
+
+	if errBook != nil {
+		responseError := &transport.ResponseError{
+			Message: "Data not found, please check your request.",
+			Status:  http.StatusNotFound,
+		}
+		return nil, responseError
+	}
+
+	if data.Name == "" {
+		data.Name = result.Name
+	}
+
+	if data.Creator == "" {
+		data.Creator = result.Creator
+	}
+
+	createPayload := entity.Book{
+		Id:      id,
+		Name:    data.Name,
+		Creator: data.Creator,
+	}
+
+	err := b.repository.UpdateBook(createPayload)
+	if err != nil {
+		response := &transport.ResponseError{
+			Message: "Un Processable Entity",
+			Status:  http.StatusUnprocessableEntity,
+		}
+		return nil, response
+	}
+
+	res := &transport.GeneralResponse{
+		Message: "Success to update book : " + createPayload.Name + ".",
+	}
+
+	return res, nil
 }

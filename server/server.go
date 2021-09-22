@@ -40,4 +40,5 @@ func (server *ApiServer) registerRouter() {
 	server.Router.HandleFunc("/api/books", bookHandler.GetList).Methods("GET")
 	server.Router.HandleFunc("/api/insertbook", bookHandler.AddBook).Methods("POST")
 	server.Router.HandleFunc("/api/books/{bookID}", bookHandler.GetByID).Methods("GET")
+	server.Router.HandleFunc("/api/updatebook/{bookID}", bookHandler.UpdateBook).Methods("PATCH")
 }
